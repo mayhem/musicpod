@@ -1,0 +1,8 @@
+*.pyc
+*.swp
+*.db
+.DS_Store
+*.db
+*.bz2
+__pycache__
+*egg-info
