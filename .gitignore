@@ -6,3 +6,4 @@
 *.bz2
 __pycache__
 *egg-info
+.ve
