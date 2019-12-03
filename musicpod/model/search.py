@@ -1,5 +1,8 @@
 # -*- coding: utf-8 -*-
 from whoosh.fields import *
+from whoosh.index import open_dir, EmptyIndexError
+import config
+
 
 schema = Schema(
     mbid=ID(stored=True), 
@@ -11,3 +14,12 @@ schema = Schema(
     tnum=NUMERIC(stored=True), 
     duration=NUMERIC(stored=True), 
     content=TEXT)
+
+ix = None
+
+def open_search_index():
+    global ix
+    try:
+        ix = open_dir(config.INDEX_DIR)
+    except EmptyIndexError as err:
+        print("cannot open search index: %s. Search will not function!" % err)

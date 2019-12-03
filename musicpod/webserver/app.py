@@ -4,9 +4,14 @@ from flask_bootstrap import Bootstrap
 import config
 import json
 
+from musicpod.model.search import open_search_index
+
 STATIC_PATH = "/static"
 STATIC_FOLDER = "../static"
 TEMPLATE_FOLDER = "../templates"
+
+print("open search index!")
+open_search_index()
 
 app = Flask(__name__,
             static_url_path = STATIC_PATH,
@@ -20,6 +25,7 @@ from musicpod.webserver.views.index import bp as index_bp
 from musicpod.webserver.views.api import bp as api_bp
 app.register_blueprint(index_bp)
 app.register_blueprint(api_bp, url_prefix='/api')
+
 
 # How do I limit this to only the index BP?
 #@app.errorhandler(404)

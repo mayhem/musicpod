@@ -5,8 +5,8 @@ import peewee
 from flask import Flask, jsonify, Blueprint, send_from_directory, request
 from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from musicpod.model.recording import Recording
+from musicpod.model.search import ix
 from whoosh.qparser import QueryParser
-from whoosh.index import open_dir
 from whoosh.fields import *
 import config
 
@@ -59,7 +59,6 @@ def search():
         raise BadRequest
 
     ret = []
-    ix = open_dir(config.INDEX_DIR)
     with ix.searcher() as searcher:
         query = QueryParser("content", ix.schema).parse(query)
         for result in searcher.search(query):
