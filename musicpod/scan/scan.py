@@ -88,6 +88,20 @@ class ScanCollection(object):
 
         return True
 
+    def add_metadaa_to_index(self, mdata):
+        self.writer.add_document(
+            mbid=mdata['recording_mbid'], 
+            name=mdata['recording'], 
+            artist=mdata['artist'], 
+            artist_mbid=mdata['artist_mbid'], 
+            release=mdata['release'], 
+            release_mbid=mdata['release_mbid'], 
+            tnum=mdata['tnum'], 
+            duration=mdata['duration'], 
+            content=mdata['recording'] + " " \
+                + mdata['artist'] + " " \
+                + mdata['release'])
+
 
     def add(self, relative_path):
 
@@ -167,19 +181,7 @@ class ScanCollection(object):
                 duration = mdata['duration'],
                 tnum = mdata['tnum'])
 
-        self.writer.add_document(
-            mbid=mdata['recording_mbid'], 
-            name=mdata['recording'], 
-            artist=mdata['artist'], 
-            artist_mbid=mdata['artist_mbid'], 
-            release=mdata['release'], 
-            release_mbid=mdata['release_mbid'], 
-            tnum=mdata['tnum'], 
-            duration=mdata['duration'], 
-            content=mdata['recording'] + " " \
-                + mdata['artist'] + " " \
-                + mdata['release'])
-
+        self.add_metadaa_to_index(mdata)
 
         return recording, status
 
@@ -202,6 +204,10 @@ class ScanCollection(object):
             recording.mtime = mdata['mtime']
             recording.tnum = mdata['tnum']
             recording.save()
+
+        # to update the document, remove it, then re-add
+        self.writer.delete_by_term("mbid", mdata['recording_mbid'])
+        self.add_metadaa_to_index(mdata)
 
         return recording, "updated"
 
