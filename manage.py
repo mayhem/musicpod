@@ -16,7 +16,13 @@ def cli():
 def init_db():
     db.create_tables([Recording])
 
+@click.command()
+def run():
+    from musicpod.webserver.app import app
+    app.run(debug=True, host="0.0.0.0", port="5000")
+
 cli.add_command(init_db)
+cli.add_command(run)
 
 def usage(command):
     with click.Context(command) as ctx:

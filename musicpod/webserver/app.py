@@ -21,6 +21,7 @@ from musicpod.webserver.views.api import bp as api_bp
 app.register_blueprint(index_bp)
 app.register_blueprint(api_bp, url_prefix='/api')
 
-@app.errorhandler(404)
-def page_not_found(message):
-    return render_template('errors/404.html', message=message), 404
+# How do I limit this to only the index BP?
+#@app.errorhandler(404)
+#def page_not_found(message):
+#    return render_template('errors/404.html', message=message), 404

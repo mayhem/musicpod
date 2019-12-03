@@ -2,11 +2,11 @@
 
 import click
 from musicpod.scan.scan import ScanCollection
+import config
 
 @click.command()
-@click.argument("music_dir", nargs=1)
-def scan_collection(music_dir):
-    sc = ScanCollection(music_dir)
+def scan_collection():
+    sc = ScanCollection(config.music_dir)
     try:
         sc.scan()
     except Exception:
