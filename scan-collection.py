@@ -6,7 +6,7 @@ import config
 
 @click.command()
 def scan_collection():
-    sc = ScanCollection(config.music_dir)
+    sc = ScanCollection(config.MUSIC_DIR)
     try:
         sc.scan()
     except Exception:

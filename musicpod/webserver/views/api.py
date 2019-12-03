@@ -2,7 +2,7 @@ import os
 import sys
 import uuid
 import peewee
-from flask import Flask, jsonify, Blueprint
+from flask import Flask, jsonify, Blueprint, send_from_directory
 from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from musicpod.model.recording import Recording
 import config
@@ -27,6 +27,13 @@ def sanity_check_and_load_recording(mbid):
     return recording
 
 
+@bp.route('/recording/<mbid>')
+def recording(mbid):
+    recording = sanity_check_and_load_recording(mbid)
+    print(recording.path)
+    return send_from_directory(config.MUSIC_DIR, recording.path)
+
+
 @bp.route('/recording/<mbid>/metadata')
 def metadata(mbid):
 
@@ -38,14 +45,8 @@ def metadata(mbid):
         "release_name" : recording.release_name,
         "release_mbid" : recording.release_mbid,
         "name" : recording.name,
-        "mtime" : recording.mtime,
         "duration" : recording.duration or 0,
         "tnum" : recording.tnum
     })
 
 
-@bp.route('/static/<mbid>')
-def recording(mbid):
-
-    recording = sanity_check_and_load_recording(mbid)
-    return jsonify(recording)

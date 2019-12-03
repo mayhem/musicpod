@@ -39,7 +39,7 @@ class ScanCollection(object):
             sys.exit(-1)
 
         db.connect()
-        self.traverse(self.music_dir)
+        self.traverse("")
 
         print("Checked %s tracks" % self.total)
         print("  %d tracks not changed since last run" % self.not_changed)
@@ -55,16 +55,21 @@ class ScanCollection(object):
 
     def traverse(self, relative_path):
 
-        fullpath = os.path.join(self.music_dir, relative_path)
+        if not relative_path:
+            fullpath = self.music_dir
+        else:
+            fullpath = os.path.join(self.music_dir, relative_path)
+
         for f in os.listdir(fullpath):
             if f in ['.', '..']: 
                 continue
 
-            item = os.path.join(relative_path, f)
-            if os.path.isfile(item): 
-                self.add(item)
-            if os.path.isdir(item): 
-                if not self.traverse(item):
+            new_relative_path = os.path.join(relative_path, f)
+            new_full_path = os.path.join(self.music_dir, new_relative_path)
+            if os.path.isfile(new_full_path): 
+                self.add(new_relative_path)
+            if os.path.isdir(new_full_path): 
+                if not self.traverse(new_relative_path):
                     return False
 
         return True
@@ -145,6 +150,7 @@ class ScanCollection(object):
                 release_name = mdata['release'],
                 release_mbid = mdata['release_mbid'],
                 mtime = mdata['mtime'],
+                duration = mdata['duration'],
                 tnum = mdata['tnum'])
 
         return recording, status
