@@ -43,7 +43,12 @@ class ScanCollection(object):
             print("Music database file does not exist. please create it first.")
             sys.exit(-1)
 
-        ix = create_in(config.INDEX_DIR, schema)
+        try:
+            ix = create_in(config.INDEX_DIR, schema)
+        except FileNotFoundError:
+            print("%s dir not found. Have you created with manage.py init-db ?", config.INDEX_DIR)
+            return
+
         self.writer = ix.writer()
         db.connect()
         self.traverse("")

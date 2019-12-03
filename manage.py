@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 
+import os
 from peewee import *
 from musicpod.model.database import db
 from musicpod.model.recording import Recording
@@ -15,6 +16,10 @@ def cli():
 @click.command()
 def init_db():
     db.create_tables([Recording])
+    try:
+        os.makedirs(config.INDEX_DIR)
+    except FileExistsError:
+        pass
 
 @click.command()
 def run():
