@@ -2,16 +2,19 @@ import os
 import sys
 import uuid
 import peewee
-from flask import Flask, jsonify, Blueprint, send_from_directory
+from flask import Flask, jsonify, Blueprint, send_from_directory, request
 from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from musicpod.model.recording import Recording
+from whoosh.qparser import QueryParser
+from whoosh.index import open_dir
+from whoosh.fields import *
 import config
 
 bp = Blueprint('api', __name__)
 
 def sanity_check_and_load_recording(mbid):
     try:
-        uuid.UUID(mbid)
+        mbid = uuid.UUID(mbid).hex
     except ValueError:
         raise BadRequest
 
@@ -49,4 +52,17 @@ def metadata(mbid):
         "tnum" : recording.tnum
     })
 
+@bp.route('/search')
+def search():
+    query = request.args.get("q", "")
+    if not query:
+        raise BadRequest
 
+    ret = []
+    ix = open_dir(config.INDEX_DIR)
+    with ix.searcher() as searcher:
+        query = QueryParser("content", ix.schema).parse(query)
+        for result in searcher.search(query):
+            ret.append(dict(result))
+
+    return jsonify(ret)

@@ -9,8 +9,12 @@ from musicpod.model.database import db
 from musicpod.model.recording import Recording
 from musicpod.scan import mp3
 from musicpod.scan import flac
-from config import DB_FILE
+from musicpod.model.search import schema
+import config
 import peewee
+from whoosh.index import create_in
+from whoosh.fields import *
+
 
 SUPPORTED_FORMATS = ["mp3", "flac"]
 
@@ -21,6 +25,7 @@ class ScanCollection(object):
 
     def __init__(self, music_dir):
         self.music_dir = music_dir
+        self.writer = None
 
     def scan(self):
         # Keep some stats
@@ -34,12 +39,15 @@ class ScanCollection(object):
         self.duplicated = 0
         self.moved = 0
 
-        if not os.path.exists(DB_FILE):
+        if not os.path.exists(config.DB_FILE):
             print("Music database file does not exist. please create it first.")
             sys.exit(-1)
 
+        ix = create_in(config.INDEX_DIR, schema)
+        self.writer = ix.writer()
         db.connect()
         self.traverse("")
+        self.writer.commit()
 
         print("Checked %s tracks" % self.total)
         print("  %d tracks not changed since last run" % self.not_changed)
@@ -52,6 +60,7 @@ class ScanCollection(object):
         print("  %d duplicated and ignored" % self.duplicated)
         if self.total != self.not_changed + self.updated + self.added + self.error + self.skipped + self.duplicated + self.moved:
             print("And for some reason these numbers don't add up to the total number of tracks. Hmmm.")
+
 
     def traverse(self, relative_path):
 
@@ -153,6 +162,20 @@ class ScanCollection(object):
                 duration = mdata['duration'],
                 tnum = mdata['tnum'])
 
+        self.writer.add_document(
+            mbid=mdata['recording_mbid'], 
+            name=mdata['recording'], 
+            artist=mdata['artist'], 
+            artist_mbid=mdata['artist_mbid'], 
+            release=mdata['release'], 
+            release_mbid=mdata['release_mbid'], 
+            tnum=mdata['tnum'], 
+            duration=mdata['duration'], 
+            content=mdata['recording'] + " " \
+                + mdata['artist'] + " " \
+                + mdata['release'])
+
+
         return recording, status
 
 
@@ -190,3 +213,5 @@ class ScanCollection(object):
             return self.update_metadata_in_db(mdata, relative_path)
         else:
             return self.add_metadata_to_db(mdata, relative_path)
+
+
