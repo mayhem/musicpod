@@ -54,6 +54,7 @@ class ScanCollection(object):
         db.connect()
         self.traverse("")
         self.writer.commit()
+        ix.close()
 
         print("Checked %s tracks" % self.total)
         print("  %d tracks not changed since last run" % self.not_changed)
