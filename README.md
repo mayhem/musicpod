@@ -14,14 +14,32 @@ public and to services like AcousticBrainz that aim to analyze music files.
 
 # Current features
 
-While the current setup isn't very polished and not easy to set up, one of the next
-steps is to wrap the whole pod into a docker setup, complete with HTTPs support 
-and some form of authentication.
-
 So far, this project can scan your music collection, make a SQLite database,
 find duplicates in your music collection and create a search index. API endpoints
 expose the metadata, the audio files and a rudimentary search mechanism to search 
 the collection.
+
+# Setting up the dev environment
+
+You'll need docker and docker-compose installed to run the music pod. To run the 
+development environment, copy config.py.sample to config.py and edit MUSIC_DIR
+to point to your MusicBrainz tagged music collection.
+
+Then to start the pod:
+
+`./develop.sh build`
+`./develop.sh`
+
+This should bring the pod up. Now to initialize the database and search indexes, run:
+
+`./manage.sh init-db`
+
+Finally, to scan your music collection and to add it to the pod, run:
+
+`./manage.sh scan
+
+That's it you're up and running!
+
 
 # API definition
 

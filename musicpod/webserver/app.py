@@ -10,7 +10,6 @@ STATIC_PATH = "/static"
 STATIC_FOLDER = "../static"
 TEMPLATE_FOLDER = "../templates"
 
-print("open search index!")
 open_search_index()
 
 app = Flask(__name__,

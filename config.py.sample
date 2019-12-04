@@ -1,0 +1,2 @@
+SECRET_KEY = "CHANGE THIS TO SOME RANDOM STING"
+MUSIC_DIR="<path to where your music lives>"

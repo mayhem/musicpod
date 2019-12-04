@@ -1,0 +1,20 @@
+version: "3.4"
+
+volumes:
+   musicpod-data:
+
+services:
+
+  musicpod:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: python3 -m musicpod.bin.manage run
+    image: musicpod
+    container_name: musicpod-dev
+    volumes:
+      - .:/code/musicpod:z
+      - ${MUSIC_DIR}:/music
+      - musicpod-data:/musicpod-data:z
+    ports:
+      - "5000:5000"

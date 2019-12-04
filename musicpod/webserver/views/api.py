@@ -6,9 +6,9 @@ from flask import Flask, jsonify, Blueprint, send_from_directory, request
 from werkzeug.exceptions import BadRequest, NotFound, ServiceUnavailable
 from musicpod.model.recording import Recording
 from musicpod.model.search import ix
+from musicpod import MUSIC_DIR
 from whoosh.qparser import QueryParser
 from whoosh.fields import *
-import config
 
 bp = Blueprint('api', __name__)
 
@@ -24,7 +24,7 @@ def sanity_check_and_load_recording(mbid):
     except peewee.DoesNotExist as err:
         raise NotFound
 
-    if not os.path.exists(os.path.join(config.MUSIC_DIR, recording.path)):
+    if not os.path.exists(os.path.join(MUSIC_DIR, recording.path)):
         raise ServiceUnavailable
 
     return recording
@@ -34,7 +34,7 @@ def sanity_check_and_load_recording(mbid):
 def recording(mbid):
     recording = sanity_check_and_load_recording(mbid)
     print(recording.path)
-    return send_from_directory(config.MUSIC_DIR, recording.path)
+    return send_from_directory(MUSIC_DIR, recording.path)
 
 
 @bp.route('/recording/<mbid>/metadata')
@@ -57,6 +57,9 @@ def search():
     query = request.args.get("q", "")
     if not query:
         raise BadRequest
+
+    if not ix:
+        raise ServiceUnavailable("search indexes not available.")
 
     ret = []
     with ix.searcher() as searcher:

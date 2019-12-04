@@ -1,0 +1,22 @@
+FROM metabrainz/python:3.7
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+RUN mkdir /code
+WORKDIR /code
+
+RUN pip3.7 install setuptools uwsgi
+
+RUN apt-get purge -y build-essential && \
+    apt-get autoremove -y && \
+    apt-get clean -y
+
+RUN mkdir /code/musicpod
+WORKDIR /code/musicpod
+
+COPY requirements.txt /code/musicpod
+RUN pip3.7 install -r requirements.txt
+
+CMD python3 manage.py run

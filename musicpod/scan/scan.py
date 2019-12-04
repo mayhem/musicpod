@@ -10,7 +10,6 @@ from musicpod.model.recording import Recording
 from musicpod.scan import mp3
 from musicpod.scan import flac
 from musicpod.model.search import schema
-import config
 import peewee
 from whoosh.index import create_in
 from whoosh.fields import *
@@ -23,8 +22,10 @@ class ScanCollection(object):
     Scan a given path and enter/update the metadata in the database
     '''
 
-    def __init__(self, music_dir):
+    def __init__(self, db_file, music_dir, index_dir):
+        self.db_file = db_file
         self.music_dir = music_dir
+        self.index_dir = index_dir
         self.writer = None
 
     def scan(self):
@@ -39,14 +40,14 @@ class ScanCollection(object):
         self.duplicated = 0
         self.moved = 0
 
-        if not os.path.exists(config.DB_FILE):
+        if not os.path.exists(self.db_file):
             print("Music database file does not exist. please create it first.")
             sys.exit(-1)
 
         try:
-            ix = create_in(config.INDEX_DIR, schema)
+            ix = create_in(self.index_dir, schema)
         except FileNotFoundError:
-            print("%s dir not found. Have you created with manage.py init-db ?", config.INDEX_DIR)
+            print("%s dir not found. Have you created with manage.py init-db ?" % self.index_dir)
             return
 
         self.writer = ix.writer()

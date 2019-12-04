@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from whoosh.fields import *
 from whoosh.index import open_dir, EmptyIndexError
-import config
+from musicpod import INDEX_DIR
 
 
 schema = Schema(
@@ -20,6 +20,6 @@ ix = None
 def open_search_index():
     global ix
     try:
-        ix = open_dir(config.INDEX_DIR)
+        ix = open_dir(INDEX_DIR)
     except EmptyIndexError as err:
         print("cannot open search index: %s. Search will not function!" % err)
